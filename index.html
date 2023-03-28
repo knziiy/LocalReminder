@@ -140,11 +140,14 @@
 
         if (nextReminder) {
           timer = setTimeout(() => {
-            if (Notification.permission === "granted") {
-              new Notification(nextReminder.title);
-              nextReminder.pushed = true;
-              sortedReminders.unshift(nextReminder);
-              saveReminders(sortedReminders);
+            if (!nextReminder.completed) {
+              if (Notification.permission === "granted") {
+                new Notification(nextReminder.title);
+                nextReminder.pushed = true;
+                sortedReminders.unshift(nextReminder);
+                saveReminders(sortedReminders);
+                updateList();
+              }
             }
           }, nextReminder.datetime - now);
         }
