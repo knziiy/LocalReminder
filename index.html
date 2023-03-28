@@ -66,15 +66,30 @@
           } else if (reminder.pushed) {
             entry.style.backgroundColor = "lightsalmon"; // 背景を薄いオレンジ色に
           }
+          parsedDate = new Date(reminder.datetime);
           entry.innerHTML = `
                   <div class="d-flex justify-content-between">
                       <div>
                           <strong>${reminder.title}</strong><br>
-                          ${reminder.datetime}
+                          ${parsedDate.getFullYear()}-${String(
+            parsedDate.getMonth() + 1
+          ).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(
+            2,
+            "0"
+          )} ${String(parsedDate.getHours()).padStart(2, "0")}:${String(
+            parsedDate.getMinutes()
+          ).padStart(2, "0")}:${String(parsedDate.getSeconds()).padStart(
+            2,
+            "0"
+          )}
                       </div>
                       <div>
-                          <button data-id="${reminder.id}" class="complete btn btn-success">完了</button>
-                          <button data-id="${reminder.id}" class="delete btn btn-danger">削除</button>
+                          <button data-id="${
+                            reminder.id
+                          }" class="complete btn btn-success">完了</button>
+                          <button data-id="${
+                            reminder.id
+                          }" class="delete btn btn-danger">削除</button>
                       </div>
                   </div>
               `;
