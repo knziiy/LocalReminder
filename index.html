@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>reminder</title>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </head>
+  <body class="container">
+    <h2 class="my-4">reminder</h2>
+    <div>
+      <input
+        type="text"
+        id="title"
+        class="form-control"
+        placeholder="タイトル"
+      />
+      <input
+        type="text"
+        id="datetime"
+        class="form-control mt-2"
+        placeholder="日時（例：2023-04-01 12:00）"
+      />
+      <button id="add" class="btn btn-primary mt-2">追加</button>
+    </div>
+    <button id="toggle-completed" class="btn btn-info mt-1 mb-3">
+      完了したタスクを再表示
+    </button>
+    <div id="list"></div>
+
+    <script>
+      const storageKey = "reminders";
+      let timer;
+      let showCompleted = false;
+
+      function getReminders() {
+        const storedData = localStorage.getItem(storageKey);
+        return storedData ? JSON.parse(storedData) : [];
+      }
+
+      function saveReminders(reminders) {
+        localStorage.setItem(storageKey, JSON.stringify(reminders));
+      }
+
+      function updateList() {
+        const reminders = getReminders();
+        const list = document.getElementById("list");
+        list.innerHTML = "";
+
+        for (const reminder of reminders) {
+          if (!showCompleted && reminder.completed) {
+            continue;
+          }
+          const entry = document.createElement("div");
+          entry.className = "entry mb-3";
+          entry.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>${reminder.title}</strong><br>
+                            ${reminder.datetime}
+                        </div>
+                        <div>
+                            <button data-id="${reminder.id}" class="complete btn btn-success">完了</button>
+                            <button data-id="${reminder.id}" class="delete btn btn-danger">削除</button>
+                        </div>
+                    </div>
+                `;
+
+          list.appendChild(entry);
+        }
+      }
+
+      function addReminder(title, datetime) {
+        const reminders = getReminders();
+        const newReminder = {
+          id: Date.now(),
+          title,
+          datetime,
+          completed: false,
+        };
+
+        reminders.push(newReminder);
+        saveReminders(reminders);
+        updateList();
+        setTimer();
+      }
+
+      function deleteReminder(id) {
+        const reminders = getReminders().filter((r) => r.id !== id);
+        saveReminders(reminders);
+        updateList();
+        setTimer();
+      }
+
+      function completeReminder(id) {
+        const reminders = getReminders();
+        const reminderIndex = reminders.findIndex((r) => r.id === id);
+        if (reminderIndex !== -1) {
+          reminders[reminderIndex].completed =
+            !reminders[reminderIndex].completed;
+          saveReminders(reminders);
+          updateList();
+        }
+      }
+
+      function toggleCompletedTasks() {
+        showCompleted = !showCompleted;
+        const toggleButton = document.getElementById("toggle-completed");
+        if (showCompleted) {
+          toggleButton.textContent = "完了したタスクを非表示";
+        } else {
+          toggleButton.textContent = "完了したタスクを再表示";
+        }
+        updateList();
+      }
+
+      function setTimer() {
+        clearTimeout(timer);
+        const reminders = getReminders();
+        const now = new Date();
+        const nextReminder = reminders
+          .map((r) => ({ ...r, datetime: new Date(r.datetime) }))
+          .filter((r) => r.datetime > now)
+          .sort((a, b) => a.datetime - b.datetime)[0];
+
+        if (nextReminder) {
+          timer = setTimeout(() => {
+            if (Notification.permission === "granted") {
+              new Notification(nextReminder.title);
+            }
+          }, nextReminder.datetime - now);
+        }
+      }
+
+      function parseDateInTitleOnlyMatchString(title) {
+        const dateRegEx =
+          /(?:(\d{4})[/-])?(\d{1,2})[/-]?(\d{1,2})?(?:[ T]?(\d{1,2})?:?(\d{1,2})?)?/;
+        const matches = title.match(dateRegEx);
+
+        if (matches) {
+          let [_, year, month, day, hour = "00", minute = "00"] = matches;
+          if (_) {
+            return _;
+          }
+        }
+        return null;
+      }
+      function parseDateInTitle(title) {
+        const dateRegEx =
+          /(?:(\d{4})[/-])?(\d{1,2})[/-]?(\d{1,2})?(?:[ T]?(\d{1,2})?:?(\d{1,2})?)?/;
+        const matches = title.match(dateRegEx);
+
+        if (matches) {
+          let [_, year, month, day, hour = "00", minute = "00"] = matches;
+
+          const today = new Date();
+
+          if (!year && month && hour === "00" && minute) {
+            hour = month;
+            month = undefined;
+          }
+
+          if (!year && !day) {
+            // time format (e.g., 01:20)
+            year = today.getFullYear();
+            month = today.getMonth() + 1;
+            day = today.getDate();
+          } else if (!year) {
+            // month-day format (e.g., 04/01)
+            year = parseInt(today.getFullYear(), 10);
+            if (today.getMonth() + 1 > parseInt(month, 10)) {
+              year++;
+            }
+          }
+
+          const date = new Date(year, month - 1, day || 1, hour, minute, 0);
+
+          if (!isNaN(date.getTime())) {
+            return date;
+          }
+        }
+        return null;
+      }
+
+      function updateDatetimeInput(title) {
+        const datetimeInput = document.getElementById("datetime");
+        const parsedDate = parseDateInTitle(title);
+        if (parsedDate) {
+          datetimeInput.value = `${parsedDate.getFullYear()}-${String(
+            parsedDate.getMonth() + 1
+          ).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(
+            2,
+            "0"
+          )} ${String(parsedDate.getHours()).padStart(2, "0")}:${String(
+            parsedDate.getMinutes()
+          ).padStart(2, "0")}:${String(parsedDate.getSeconds()).padStart(
+            2,
+            "0"
+          )}`;
+        }
+      }
+
+      function init() {
+        if (!("Notification" in window)) {
+          alert("このブラウザはデスクトップ通知に対応していません。");
+        } else if (Notification.permission !== "granted") {
+          Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+              setTimer();
+            }
+          });
+        }
+
+        updateList();
+
+        const titleInput = document.getElementById("title");
+        titleInput.addEventListener("input", () => {
+          updateDatetimeInput(titleInput.value);
+        });
+
+        titleInput.addEventListener("keydown", (e) => {
+          if (e.keyCode === 13) {
+            e.preventDefault();
+            document.getElementById("add").click();
+          }
+        });
+
+        const addButton = document.getElementById("add");
+        addButton.addEventListener("click", () => {
+          const datetimeInput = document.getElementById("datetime");
+
+          let title = titleInput.value;
+          const datetime = datetimeInput.value;
+
+          if (title && datetime) {
+            const parsedDate = parseDateInTitleOnlyMatchString(title);
+            if (parsedDate) {
+              title = title.replace(parsedDate, "").trim();
+            }
+            addReminder(title, datetime);
+            titleInput.value = "";
+            datetimeInput.value = "";
+          } else {
+            alert("タイトルと日時を入力してください。");
+          }
+        });
+
+        const list = document.getElementById("list");
+        list.addEventListener("click", (e) => {
+          if (e.target.classList.contains("delete")) {
+            const id = parseInt(e.target.dataset.id);
+            deleteReminder(id);
+          }
+        });
+
+        setTimer();
+      }
+       // 以前の関数はそのままで、ここから下に新しいイベントリスナーを追加します。
+
+      const list = document.getElementById("list");
+      list.addEventListener("click", (e) => {
+        if (e.target.classList.contains("delete")) {
+          const id = parseInt(e.target.dataset.id);
+          deleteReminder(id);
+        } else if (e.target.classList.contains("complete")) {
+          const id = parseInt(e.target.dataset.id);
+          completeReminder(id);
+        }
+      });
+
+      const toggleCompletedButton = document.getElementById("toggle-completed");
+      toggleCompletedButton.addEventListener("click", () => {
+        toggleCompletedTasks();
+      });
+
+      init();
+    </script>
+  </body>
+</html>
