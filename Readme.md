@@ -13,6 +13,8 @@ For example, if the current time is 2023/03/20 10:00, entering "Tasks Title 0401
 
 Entering "Task Title 10:30" will set it to "2023/03/20 10:30".
 
+And when the set time for a task arrives, a desktop notification will be sent.
+
 I wanted to bring back the behavior of Apple's past reminders.
 
 ## Screen Image
