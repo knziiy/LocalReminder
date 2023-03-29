@@ -53,10 +53,10 @@ function updateList() {
                       <div class="btn-group">
                           <button data-id="${
                             reminder.id
-                          }" class="complete btn btn-info btn-sm mr-2 mt-1 mb-1">Complete</button>
+                          }" class="complete btn btn-info btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Complete</button>
                           <button data-id="${
                             reminder.id
-                          }" class="delete btn btn-secondary btn-sm mr-2 mt-1 mb-1">Delete</button>
+                          }" class="delete btn btn-secondary btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Delete</button>
                       </div>
                   </div>
               `;
