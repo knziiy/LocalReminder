@@ -8,37 +8,40 @@
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link href="main.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </head>
   <body class="container">
-    <h2 class="my-4">reminder</h2>
+    <h2 class="my-4">Local Reminder</h2>
     <div>
-      <input
-        type="text"
-        id="title"
-        class="form-control"
-        placeholder="タイトル"
-      />
+      <input type="text" id="title" class="form-control" placeholder="Task" />
       <input
         type="text"
         id="datetime"
         class="form-control mt-2"
-        placeholder="日時（例：2023-04-01 12:00）"
+        placeholder="DateTime（ex: 2023-04-01 12:00）"
       />
-      <button id="add" class="btn btn-primary mt-2 mb-2">追加</button>
-      <button id="toggle-completed" class="btn btn-info mt-2 mb-2">
-        完了したタスクを再表示
+      <button id="add" class="btn btn-primary btn-sm mt-2 mb-2">Add</button>
+      <button id="toggle-completed" class="btn btn-info btn-sm mt-2 mb-2">
+        Show completed tasks
       </button>
     </div>
 
     <div id="list"></div>
 
+    <div class="text-right">
+      <a id="toggle-deleted" class="text-reset" style="font-size: 0.4em">
+        Show deleted tasks
+      </a>
+    </div>
+
     <script>
       const storageKey = "reminders";
       let timer;
       let showCompleted = false;
+      let showDeleted = false;
 
       function getReminders() {
         const storedData = localStorage.getItem(storageKey);
@@ -50,7 +53,9 @@
       }
 
       function updateList() {
-        const reminders = getReminders();
+        const reminders = getReminders()
+          .map((r) => ({ ...r, datetime: new Date(r.datetime) }))
+          .sort((a, b) => a.datetime - b.datetime);
         const list = document.getElementById("list");
         list.innerHTML = "";
 
@@ -58,18 +63,23 @@
           if (!showCompleted && reminder.completed) {
             continue;
           }
+          if (!showDeleted && reminder.deleted) {
+            continue;
+          }
           const entry = document.createElement("div");
           entry.className = "entry mb-3";
 
-          if (reminder.completed) {
-            entry.style.backgroundColor = "lightgray"; // 背景を薄いグレーに
+          if (reminder.deleted) {
+            entry.style.backgroundColor = "black";
+          } else if (reminder.completed) {
+            entry.style.backgroundColor = "lightgray";
           } else if (reminder.pushed) {
-            entry.style.backgroundColor = "lightsalmon"; // 背景を薄いオレンジ色に
+            entry.style.backgroundColor = "lightsalmon";
           }
           parsedDate = new Date(reminder.datetime);
           entry.innerHTML = `
                   <div class="d-flex justify-content-between">
-                      <div>
+                      <div class="ml-2">
                           <strong>${reminder.title}</strong><br>
                           ${parsedDate.getFullYear()}-${String(
             parsedDate.getMonth() + 1
@@ -78,18 +88,15 @@
             "0"
           )} ${String(parsedDate.getHours()).padStart(2, "0")}:${String(
             parsedDate.getMinutes()
-          ).padStart(2, "0")}:${String(parsedDate.getSeconds()).padStart(
-            2,
-            "0"
-          )}
+          ).padStart(2, "0")}
                       </div>
                       <div>
                           <button data-id="${
                             reminder.id
-                          }" class="complete btn btn-success">完了</button>
+                          }" class="complete btn btn-success btn-sm mt-2">Complete</button>
                           <button data-id="${
                             reminder.id
-                          }" class="delete btn btn-danger">削除</button>
+                          }" class="delete btn btn-danger btn-sm mr-2 mt-2">Delete</button>
                       </div>
                   </div>
               `;
@@ -106,6 +113,7 @@
           datetime,
           completed: false,
           pushed: false,
+          deleted: false,
         };
 
         reminders.push(newReminder);
@@ -115,7 +123,12 @@
       }
 
       function deleteReminder(id) {
-        const reminders = getReminders().filter((r) => r.id !== id);
+        const reminders = getReminders().map(function (r) {
+          if (r.id == id) {
+            r.deleted = true;
+          }
+          return r;
+        });
         saveReminders(reminders);
         updateList();
         setTimer();
@@ -136,13 +149,23 @@
         showCompleted = !showCompleted;
         const toggleButton = document.getElementById("toggle-completed");
         if (showCompleted) {
-          toggleButton.textContent = "完了したタスクを非表示";
+          toggleButton.textContent = "Hide completed tasks";
         } else {
-          toggleButton.textContent = "完了したタスクを再表示";
+          toggleButton.textContent = "Show completed tasks";
         }
         updateList();
       }
 
+      function toggleDeletedTasks() {
+        showDeleted = !showDeleted;
+        const toggleButton = document.getElementById("toggle-deleted");
+        if (showDeleted) {
+          toggleButton.innerHTML = "Hide deleted tasks";
+        } else {
+          toggleButton.innerHTML = "Show deleted tasks";
+        }
+        updateList();
+      }
       function setTimer() {
         clearTimeout(timer);
         var reminders = getReminders();
@@ -170,7 +193,7 @@
 
       function parseDateInTitleOnlyMatchString(title) {
         const dateRegEx =
-          /(?:(\d{4})[/-])?(\d{1,2})[/-]?(\d{1,2})?(?:[ T]?(\d{1,2})?:?(\d{1,2})?)?/;
+          / (?:(\d{4})[/-])?(\d{1,2})[/-]?(\d{1,2})?(?:[ T]?(\d{1,2})?:?(\d{1,2})?)?/;
         const matches = title.match(dateRegEx);
 
         if (matches) {
@@ -183,7 +206,7 @@
       }
       function parseDateInTitle(title) {
         const dateRegEx =
-          /(?:(\d{4})[/-])?(\d{1,2})[/-]?(\d{1,2})?(?:[ T]?(\d{1,2})?:?(\d{1,2})?)?/;
+          / (?:(\d{4})[/-])?(\d{1,2})[/-]?(\d{1,2})?(?:[ T]?(\d{1,2})?:?(\d{1,2})?)?/;
         const matches = title.match(dateRegEx);
 
         if (matches) {
@@ -238,7 +261,7 @@
 
       function init() {
         if (!("Notification" in window)) {
-          alert("このブラウザはデスクトップ通知に対応していません。");
+          alert("This browser does not support desktop notifications.");
         } else if (Notification.permission !== "granted") {
           Notification.requestPermission().then((permission) => {
             if (permission === "granted") {
@@ -261,6 +284,14 @@
           }
         });
 
+        const datetimeInput = document.getElementById("datetime");
+        datetimeInput.addEventListener("keydown", (e) => {
+          if (e.keyCode === 13) {
+            e.preventDefault();
+            document.getElementById("add").click();
+          }
+        });
+
         const addButton = document.getElementById("add");
         addButton.addEventListener("click", () => {
           const datetimeInput = document.getElementById("datetime");
@@ -273,11 +304,22 @@
             if (parsedDate) {
               title = title.replace(parsedDate, "").trim();
             }
-            addReminder(title, datetime);
-            titleInput.value = "";
-            datetimeInput.value = "";
+            var reminders = getReminders();
+            var registedReminders = reminders
+              .map((r) => ({ ...r, datetime: new Date(r.datetime) }))
+              .filter((r) => r.datetime - new Date(datetime) == 0);
+
+            if (registedReminders[0]) {
+              alert(
+                "That date/time is already registered. Please choose a time at least 1 minute later."
+              );
+            } else {
+              addReminder(title, datetime);
+              titleInput.value = "";
+              datetimeInput.value = "";
+            }
           } else {
-            alert("タイトルと日時を入力してください。");
+            alert("Please enter the task and date/time.");
           }
         });
 
@@ -291,7 +333,6 @@
 
         setTimer();
       }
-      // 以前の関数はそのままで、ここから下に新しいイベントリスナーを追加します。
 
       const list = document.getElementById("list");
       list.addEventListener("click", (e) => {
@@ -307,6 +348,11 @@
       const toggleCompletedButton = document.getElementById("toggle-completed");
       toggleCompletedButton.addEventListener("click", () => {
         toggleCompletedTasks();
+      });
+
+      const toggleDeletedButton = document.getElementById("toggle-deleted");
+      toggleDeletedButton.addEventListener("click", () => {
+        toggleDeletedTasks();
       });
 
       init();

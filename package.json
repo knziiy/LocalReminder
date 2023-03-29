@@ -1,5 +1,5 @@
 {
-  "name": "reminder",
+  "name": "LocalReminder",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -8,6 +8,7 @@
     "build": "electron-builder --dir",
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "electron-forge package",
+    "make": "electron-forge make",
     "make": "electron-forge make"
   },
   "devDependencies": {
@@ -23,6 +24,12 @@
       "target": {
         "target": "dir",
         "arch": "universal"
+      }
+    },
+    "win": {
+      "target": {
+        "target": "dir",
+        "arch": "x64"
       }
     }
   },
