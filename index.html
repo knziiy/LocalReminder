@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>reminder</title>
+    <title>Local Reminder</title>
     <link
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
@@ -13,8 +13,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </head>
-  <body class="container">
-    <h2 class="my-4">Local Reminder</h2>
+  <body class="container-fluid">
+    <h3 class="my-2">Local Reminder</h2>
+    <hr class="my-2">
     <div>
       <input type="text" id="title" class="form-control" placeholder="Task" />
       <input
@@ -90,13 +91,13 @@
             parsedDate.getMinutes()
           ).padStart(2, "0")}
                       </div>
-                      <div>
+                      <div class="btn-group">
                           <button data-id="${
                             reminder.id
-                          }" class="complete btn btn-success btn-sm mt-2">Complete</button>
+                          }" class="complete btn btn-info btn-sm mr-2 mt-1 mb-1">Complete</button>
                           <button data-id="${
                             reminder.id
-                          }" class="delete btn btn-danger btn-sm mr-2 mt-2">Delete</button>
+                          }" class="delete btn btn-secondary btn-sm mr-2 mt-1 mb-1">Delete</button>
                       </div>
                   </div>
               `;
