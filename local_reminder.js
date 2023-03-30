@@ -101,6 +101,7 @@ function completeReminder(id) {
     reminders[reminderIndex].completed = !reminders[reminderIndex].completed;
     saveReminders(reminders);
     updateList();
+    setTimer();
   }
 }
 

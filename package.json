@@ -19,33 +19,6 @@
     "electron": "^23.2.0",
     "electron-builder": "^23.6.0"
   },
-  "build": {
-    "appId": "com.electron.yourappid",
-    "productName": "your-product-name",
-    "asar": false,
-    "mac": {
-      "target": [
-        "pkg"
-      ],
-      "entitlements": "entitlements.mac.plist"
-    },
-    "win": {
-      "target": [
-        {
-          "target": "zip",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "msi",
-          "arch": [
-            "x64"
-          ]
-        }
-      ]
-    }
-  },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0"
   }
