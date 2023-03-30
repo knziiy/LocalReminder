@@ -1,5 +1,7 @@
 module.exports = {
-  packagerConfig: {},
+  packagerConfig: {
+    icon: 'local-reminder-icon'
+  },
   rebuildConfig: {},
   makers: [
     {
