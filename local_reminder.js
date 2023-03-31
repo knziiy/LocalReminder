@@ -12,6 +12,11 @@ function saveReminders(reminders) {
   localStorage.setItem(storageKey, JSON.stringify(reminders));
 }
 
+function linkify(text) {
+  const urlPattern = /(\b(?:https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
+  return text.replace(urlPattern, '<a href="$1" target="_blank">$1</a>');
+}
+
 function updateList() {
   const reminders = getReminders()
     .map((r) => ({ ...r, datetime: new Date(r.datetime) }))
@@ -37,10 +42,13 @@ function updateList() {
       entry.style.backgroundColor = "lightsalmon";
     }
     parsedDate = new Date(reminder.datetime);
+
+    const linkifiedTitle = linkify(reminder.title);
+
     entry.innerHTML = `
                   <div class="d-flex justify-content-between">
                   <div class="ml-2">
-                      <strong>${reminder.title}</strong><br>
+                      <strong>${linkifiedTitle}</strong><br>
                       ${parsedDate.getFullYear()}-${String(
       parsedDate.getMonth() + 1
     ).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(
@@ -50,7 +58,7 @@ function updateList() {
       parsedDate.getMinutes()
     ).padStart(2, "0")}
                   </div>
-                  <div>
+                  <div class="btn-group">
                       ${
                         reminder.pushed && !reminder.completed
                           ? `<button data-id="${reminder.id}" class="remind-again btn btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Notify again in 1 hour</button>`
