@@ -44,11 +44,17 @@ function updateList() {
     parsedDate = new Date(reminder.datetime);
 
     const linkifiedTitle = linkify(reminder.title);
+    let linkifiedMemo;
+    if (reminder.memo) {
+      linkifiedMemo = linkify(reminder.memo);
+    }
 
     entry.innerHTML = `
                   <div class="d-flex justify-content-between">
                   <div class="ml-2">
                       <strong>${linkifiedTitle}</strong><br>
+                      ${ reminder.memo ? `<span class="memo">${linkifiedMemo}</span><br>`:""
+                      }
                       ${parsedDate.getFullYear()}-${String(
       parsedDate.getMonth() + 1
     ).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(
@@ -58,18 +64,18 @@ function updateList() {
       parsedDate.getMinutes()
     ).padStart(2, "0")}
                   </div>
-                  <div class="btn-group">
+                  <div class="btn-group ${reminder.memo ? `mt-3` : `mt-2`} mb-2">
                       ${
                         reminder.pushed && !reminder.completed
-                          ? `<button data-id="${reminder.id}" class="remind-again btn btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Notify again in 1 hour</button>`
+                          ? `<button data-id="${reminder.id}" class="remind-again btn btn-sm mr-2" style="height:2.5em;">Notify again in 1 hour</button>`
                           : ""
                       }
                       <button data-id="${
                         reminder.id
-                      }" class="complete btn btn-info btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Complete</button>
+                      }" class="complete btn btn-info btn-sm mr-2 " style="height:2.5em;">Complete</button>
                       <button data-id="${
                         reminder.id
-                      }" class="delete btn btn-secondary btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Delete</button>
+                      }" class="delete btn btn-secondary btn-sm mr-2" style="height:2.5em;">Delete</button>
                   </div>
               </div>
               `;
@@ -92,11 +98,12 @@ function postponeReminder(id) {
   }
 }
 
-function addReminder(title, datetime) {
+function addReminder(title, memo, datetime) {
   const reminders = getReminders();
   const newReminder = {
     id: Date.now(),
     title,
+    memo,
     datetime,
     completed: false,
     pushed: false,
@@ -271,6 +278,14 @@ function init() {
     }
   });
 
+  const memoInput = document.getElementById("memo");
+  memoInput.addEventListener("keydown", (e) => {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      document.getElementById("add").click();
+    }
+  });
+
   const datetimeInput = document.getElementById("datetime");
   datetimeInput.addEventListener("keydown", (e) => {
     if (e.keyCode === 13) {
@@ -284,6 +299,7 @@ function init() {
     const datetimeInput = document.getElementById("datetime");
 
     let title = titleInput.value;
+    let memo = memoInput.value;
     const datetime = datetimeInput.value;
 
     if (title && datetime) {
@@ -301,8 +317,9 @@ function init() {
           "That date/time is already registered. Please choose a time at least 1 minute later."
         );
       } else {
-        addReminder(title, datetime);
+        addReminder(title, memo, datetime);
         titleInput.value = "";
+        memoInput.value = "";
         datetimeInput.value = "";
       }
     } else {

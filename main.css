@@ -21,3 +21,7 @@ body {
 .btn {
     border-radius: 15px !important;
 }
+
+.memo {
+    font-size: smaller;
+}
