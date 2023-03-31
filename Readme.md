@@ -26,7 +26,7 @@ I wanted to bring back the behavior of Apple's past reminders.
 ## Install
 
 ```bash
-npm install electron @electron-forge/cli
+npm i
 npm run make
 cp -r out/LocalReminder-darwin-arm64/LocalReminder.app /path/to/Applications
 ```
