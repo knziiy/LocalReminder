@@ -1,7 +1,7 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, shell } = require('electron')
 const path = require('path')
 
 const createWindow = () => {
@@ -16,6 +16,13 @@ const createWindow = () => {
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http')) {
+        shell.openExternal(url)
+    }
+    return { action: 'deny' }
+})
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
