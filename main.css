@@ -13,3 +13,11 @@ body {
 .entry:hover {
     background-color:oldlace;
 }
+
+.remind-again {
+    background-color:beige;
+}
+
+.btn {
+    border-radius: 15px;
+}

@@ -39,9 +39,9 @@ function updateList() {
     parsedDate = new Date(reminder.datetime);
     entry.innerHTML = `
                   <div class="d-flex justify-content-between">
-                      <div class="ml-2">
-                          <strong>${reminder.title}</strong><br>
-                          ${parsedDate.getFullYear()}-${String(
+                  <div class="ml-2">
+                      <strong>${reminder.title}</strong><br>
+                      ${parsedDate.getFullYear()}-${String(
       parsedDate.getMonth() + 1
     ).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(
       2,
@@ -49,19 +49,38 @@ function updateList() {
     )} ${String(parsedDate.getHours()).padStart(2, "0")}:${String(
       parsedDate.getMinutes()
     ).padStart(2, "0")}
-                      </div>
-                      <div class="btn-group">
-                          <button data-id="${
-                            reminder.id
-                          }" class="complete btn btn-info btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Complete</button>
-                          <button data-id="${
-                            reminder.id
-                          }" class="delete btn btn-secondary btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Delete</button>
-                      </div>
                   </div>
+                  <div>
+                      ${
+                        reminder.pushed && !reminder.completed
+                          ? `<button data-id="${reminder.id}" class="remind-again btn btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Notify again in 1 hour</button>`
+                          : ""
+                      }
+                      <button data-id="${
+                        reminder.id
+                      }" class="complete btn btn-info btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Complete</button>
+                      <button data-id="${
+                        reminder.id
+                      }" class="delete btn btn-secondary btn-sm mr-2 mt-2 mb-2" style="height:2.5em;">Delete</button>
+                  </div>
+              </div>
               `;
 
     list.appendChild(entry);
+  }
+}
+
+function postponeReminder(id) {
+  const reminders = getReminders();
+  const reminderIndex = reminders.findIndex((r) => r.id === id);
+  if (reminderIndex !== -1) {
+    const newDatetime = new Date(Date.now());
+    newDatetime.setHours(newDatetime.getHours() + 1);
+    reminders[reminderIndex].datetime = newDatetime;
+    reminders[reminderIndex].pushed = false;
+    saveReminders(reminders);
+    updateList();
+    setTimer();
   }
 }
 
@@ -302,6 +321,9 @@ list.addEventListener("click", (e) => {
   } else if (e.target.classList.contains("complete")) {
     const id = parseInt(e.target.dataset.id);
     completeReminder(id);
+  } else if (e.target.classList.contains("remind-again")) {
+    const id = parseInt(e.target.dataset.id);
+    postponeReminder(id);
   }
 });
 
