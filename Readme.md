@@ -36,6 +36,5 @@ You can obtain the pre-built .app file from the [Release page](https://github.co
 ```bash
 npm i
 npm run make
-cp -r out/TinyReminder-darwin-arm64/TinyReminder.app /path/to/Applications
 ```
 
