@@ -28,6 +28,11 @@ I wanted to bring back the behavior of Apple's past reminders.
 
 ## Install
 
+You can obtain the pre-built .app file from the [Release page](https://github.com/knziiy/TinyReminder/releases). 
+
+
+## Build
+
 ```bash
 npm i
 npm run make
