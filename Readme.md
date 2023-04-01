@@ -1,5 +1,9 @@
 # Tiny Reminder
 
+<div align="left">
+  <img src="static/icon.iconset/icon_128x128.png">
+</div>
+
 Tiny Reminder is an Electron-based reminder app.
 
 It stores reminder data in the local machine's Local Storage.
