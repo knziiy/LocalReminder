@@ -20,8 +20,9 @@ I wanted to bring back the behavior of Apple's past reminders.
 ## Screen Image
 
 <div align="center">
-  <img src="static/local_reminder-view.png">
+  <img src="static/local-reminder-movie.gif">
 </div>
+
 
 ## Install
 
