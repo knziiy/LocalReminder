@@ -1,6 +1,6 @@
-# Local Reminder
+# Tiny Reminder
 
-Local Reminder is an Electron-based reminder app.
+Tiny Reminder is an Electron-based reminder app.
 
 It stores reminder data in the local machine's Local Storage.
 
@@ -20,7 +20,7 @@ I wanted to bring back the behavior of Apple's past reminders.
 ## Screen Image
 
 <div align="center">
-  <img src="static/local-reminder-movie.gif">
+  <img src="static/tiny-reminder-movie.gif">
 </div>
 
 
@@ -29,6 +29,6 @@ I wanted to bring back the behavior of Apple's past reminders.
 ```bash
 npm i
 npm run make
-cp -r out/LocalReminder-darwin-arm64/LocalReminder.app /path/to/Applications
+cp -r out/TinyReminder-darwin-arm64/TinyReminder.app /path/to/Applications
 ```
 
