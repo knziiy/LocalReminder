@@ -21,8 +21,6 @@ And when the set time for a task arrives, a desktop notification will be sent.
 
 I wanted to bring back the behavior of Apple's past reminders.
 
-## Screen Image
-
 <div align="center">
   <img src="static/tiny-reminder-movie.gif">
 </div>
