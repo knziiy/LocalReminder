@@ -15,16 +15,17 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </head>
   <body class="container-fluid">
-    <h3 class="my-2">Tiny Reminder</h2>
+    <h4 class="my-2">Tiny Reminder <span class="text-success" style="font-size: 30% !important;">All data is stored locally and will not be sent externally.</span></h4>
+    
     <hr class="my-2">
     <div>
       <input type="text" id="title" class="form-control" placeholder="Title" />
-      <input type="text" id="memo" class="form-control form-control-sm mt-2" placeholder="Memo" />
+      <input type="text" id="memo" class="form-control form-control-sm" placeholder=" Memo" />
       <input
         type="text"
         id="datetime"
         class="form-control form-control-sm mt-2"
-        placeholder="DateTime（ex: 2023-04-01 12:00）"
+        placeholder=" DateTime（ex: 2023-04-01 12:00）"
       />
       <button id="add" class="btn btn-primary btn-sm mt-2 mb-2">Add</button>
       <button id="toggle-completed" class="btn btn-info btn-sm mt-2 mb-2">
