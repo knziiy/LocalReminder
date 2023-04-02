@@ -38,3 +38,8 @@ npm i
 npm run make
 ```
 
+## Author & License
+
+* knziiy
+* License:  
+  MIT (see LICENSE)
